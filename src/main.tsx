@@ -664,6 +664,7 @@ function ColorMaster({
     Papa.parse<Record<string, string>>(file, {
       header: true,
       skipEmptyLines: true,
+      beforeFirstChunk: stripCsvSeparatorHint,
       complete: (result) => {
         const sourceByCode = new Map(allColors.map((color) => [color.code, color]));
         const imported = result.data
@@ -786,6 +787,8 @@ function StockOpname(props: {
     if (!file) return;
     Papa.parse<{ color_code: string; actual_stock_grams: string }>(file, {
       header: true,
+      skipEmptyLines: true,
+      beforeFirstChunk: stripCsvSeparatorHint,
       complete: (result) => {
         const imported = new Map(result.data.map((row) => [row.color_code, Number(row.actual_stock_grams)]));
         props.onImport(
@@ -1042,6 +1045,10 @@ function numberOr(fallback: number, value: string | undefined) {
 function parseBoolean(fallback: boolean, value: string | undefined) {
   if (!value) return fallback;
   return ["true", "yes", "active", "1"].includes(value.trim().toLowerCase());
+}
+
+function stripCsvSeparatorHint(chunk: string) {
+  return chunk.replace(/^\uFEFF?sep=.+\r?\n/i, "");
 }
 
 function formatPacks(grams: number) {

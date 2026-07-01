@@ -101,9 +101,10 @@ export function reorderTimeline(rows: ForecastRow[]) {
   }));
 }
 
-export function generateCsv(rows: Record<string, unknown>[]) {
+export function generateCsv(rows: Record<string, unknown>[], delimiter = ";") {
   if (!rows.length) return "";
   const headers = Object.keys(rows[0]);
   const escape = (value: unknown) => `"${String(value ?? "").replace(/"/g, '""')}"`;
-  return [headers.join(","), ...rows.map((row) => headers.map((header) => escape(row[header])).join(","))].join("\n");
+  const body = [headers.join(delimiter), ...rows.map((row) => headers.map((header) => escape(row[header])).join(delimiter))].join("\r\n");
+  return `\ufeffsep=${delimiter}\r\n${body}`;
 }
